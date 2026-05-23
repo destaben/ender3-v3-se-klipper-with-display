@@ -112,6 +112,10 @@ config WANT_HARD_PWM
     bool
     depends on HAVE_GPIO_HARD_PWM
     default y
+config WANT_PRTOUCH
+    bool
+    depends on HAVE_GPIO
+    default y
 config WANT_BUTTONS
     bool
     depends on HAVE_GPIO
@@ -205,6 +209,9 @@ config WANT_SOFTWARE_I2C
 config WANT_HARD_PWM
     bool "Support hardware PWM (pulse width modulation)"
     depends on HAVE_GPIO_HARD_PWM
+config WANT_PRTOUCH
+    bool "Support prtouch bed leveling (dirzctl/hx711s)"
+    depends on HAVE_GPIO
 config WANT_BUTTONS
     bool "Support GPIO based button reading"
     depends on HAVE_GPIO
