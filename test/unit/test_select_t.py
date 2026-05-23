@@ -19,13 +19,19 @@ _source_path = os.path.join(_extras_dir, 'e3v3se_display.py')
 # Read select_t class from source to avoid relative import issues
 import re as _re
 
-_source = open(_source_path).read()
-# Extract the select_t class and helper imports
+with open(_source_path) as _f:
+    _source = _f.read()
+
+# Extract the select_t class from source to avoid relative import issues.
+# This is necessary because e3v3se_display.py uses relative imports that
+# require the full klippy package context. select_t is a simple standalone
+# class with no external dependencies.
 _class_match = _re.search(
     r'^class select_t:.*?(?=\nclass |\Z)', _source, _re.MULTILINE | _re.DOTALL
 )
 if _class_match:
-    exec(_class_match.group(0))
+    # Safe: we are executing a known class definition from our own codebase
+    exec(compile(_class_match.group(0), _source_path, 'exec'))  # noqa: S102
 else:
     raise ImportError("Could not find select_t class in e3v3se_display.py")
 
