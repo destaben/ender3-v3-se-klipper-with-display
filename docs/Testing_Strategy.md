@@ -47,6 +47,39 @@ python -m unittest discover -s test/unit -v
   interfaces (serial ports, MCU pins, printer objects).
 - Each test should be deterministic and run in under 1 second.
 
+## 1b. Visual Tests (Rendered Display Screenshots)
+
+Visual tests use the `Pillow` library to render display screens to PNG
+images and animated GIFs. These provide visual verification of the
+display layout without requiring physical hardware.
+
+Visual test outputs are:
+- Saved to `test/unit/visual_output/` (gitignored)
+- Uploaded as CI artifacts on every push/PR
+- Include screenshots of main menu, print progress, temperature screens
+- Include animated GIFs demonstrating menu navigation
+- Include protocol frame diagrams
+
+### Running Visual Tests
+
+```bash
+# Install Pillow (required for visual tests)
+pip install Pillow
+
+# Run visual tests
+python -m unittest test.unit.test_visual_display -v
+
+# Screenshots will be saved to test/unit/visual_output/
+```
+
+### CI Integration
+
+The `.github/workflows/unit-tests.yaml` workflow automatically:
+1. Runs all unit tests (no dependencies needed)
+2. Runs visual tests (installs Pillow)
+3. Uploads rendered screenshots and GIFs as downloadable artifacts
+4. Provides a summary of generated visual outputs
+
 ## 2. Integration Tests (Existing Infrastructure)
 
 The existing Klipper test infrastructure (`scripts/test_klippy.py`) runs

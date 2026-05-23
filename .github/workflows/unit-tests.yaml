@@ -1,0 +1,64 @@
+# Run unit tests and visual display tests
+name: Unit & Visual Tests
+
+on: [push, pull_request]
+
+jobs:
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Run unit tests
+      run: python -m unittest discover -s test/unit -p "test_printer_interface.py" -v && python -m unittest discover -s test/unit -p "test_tjc3224.py" -v && python -m unittest discover -s test/unit -p "test_select_t.py" -v
+
+  visual-tests:
+    name: Visual Display Tests
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        pip install Pillow
+        sudo apt-get update
+        sudo apt-get install -y fonts-dejavu-core
+
+    - name: Run visual tests
+      run: python -m unittest test.unit.test_visual_display -v
+
+    - name: Upload visual test screenshots
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: visual-test-screenshots
+        path: test/unit/visual_output/
+        retention-days: 30
+
+    - name: Display test results summary
+      if: always()
+      run: |
+        echo "## Visual Test Screenshots" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "The following visual test outputs were generated:" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        if [ -d test/unit/visual_output ]; then
+          for f in test/unit/visual_output/*; do
+            echo "- \`$(basename $f)\`" >> $GITHUB_STEP_SUMMARY
+          done
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Download the **visual-test-screenshots** artifact to view the rendered display screens and protocol diagrams." >> $GITHUB_STEP_SUMMARY
+        else
+          echo "No visual output was generated." >> $GITHUB_STEP_SUMMARY
+        fi
