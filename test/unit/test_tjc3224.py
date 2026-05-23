@@ -7,7 +7,9 @@ import os
 import unittest
 
 # Add the klippy extras path so we can import the modules under test
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', 'klippy', 'extras'))
+_extras_path = os.path.join(
+    os.path.dirname(__file__), '..', '..', 'klippy', 'extras')
+sys.path.insert(0, _extras_path)
 sys.path.insert(0, os.path.dirname(__file__))
 
 from mock_serial import MockSerial
@@ -81,7 +83,8 @@ class TestTJC3224Send(unittest.TestCase):
         # First write: data_frame (head + 0x00)
         self.assertEqual(self.serial.writes[0], b"\xAA\x00")
         # Second write: tail
-        self.assertEqual(self.serial.writes[1], bytes([0xCC, 0x33, 0xC3, 0x3C]))
+        self.assertEqual(
+            self.serial.writes[1], bytes([0xCC, 0x33, 0xC3, 0x3C]))
 
     def test_send_resets_data_frame(self):
         """After send(), data_frame should be reset to head."""
