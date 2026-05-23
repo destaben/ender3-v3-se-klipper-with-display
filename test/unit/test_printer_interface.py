@@ -7,7 +7,10 @@ import os
 import unittest
 
 # Add the klippy extras path so we can import the modules under test
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', 'klippy', 'extras'))
+_extras = os.path.join(
+    os.path.dirname(__file__), '..', '..', 'klippy', 'extras'
+)
+sys.path.insert(0, _extras)
 
 from printerInterface import (
     xyze_t, AxisEnum, HMI_value_t, HMI_Flag_t, material_preset_t
