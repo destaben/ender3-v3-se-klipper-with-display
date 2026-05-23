@@ -145,18 +145,9 @@ class PrinterData:
         material_preset_t("PLA", 200, 60),
         material_preset_t("ABS", 210, 100),
     ]
-    subdirs = []
     subdirIndex = 0
-    fl = []
     subdirPath = ''
     selectedFile = ''
-
-    metadata = {
-        'layer_height': None,
-        'estimated_time': None,
-        'filament_used': None,
-        'thumbnail': None
-    }
 
     MACHINE_SIZE = "220x220x250"
     SHORT_BUILD_VERSION = "1.00"
@@ -171,6 +162,18 @@ class PrinterData:
         self._logging = config.getboolean("logging", False)
         self.gcode = self.printer.lookup_object("gcode")
         self.status = None
+        self.job_Info = None
+
+        # Instance-level mutable state (not shared across instances)
+        self.subdirs = []
+        self.fl = []
+        self.names = []
+        self.metadata = {
+            'layer_height': None,
+            'estimated_time': None,
+            'filament_used': None,
+            'thumbnail': None
+        }
 
     def handle_ready(self):
         self.update_variable()
@@ -338,8 +341,8 @@ class PrinterData:
                 self.BABY_Z_VAR = z_offset
                 self.HMI_ValueStruct.offset_value = z_offset * 100
                 Update = True
-        except:
-            pass  # missing key, shouldn't happen, fixes misses on conditionals ¯\_(ツ)_/¯
+        except (KeyError, IndexError, TypeError) as e:
+            logging.debug("PrinterData: update_variable: %s", e)
         self.job_Info = self.printer.lookup_object(
             "print_stats").get_status(self.reactor.monotonic())
         if self.job_Info:
@@ -349,10 +352,10 @@ class PrinterData:
         return Update
 
     def printingIsPaused(self):
-        return (
-            self.job_Info["state"] == "paused"
-            or self.job_Info["state"] == "pausing"
-        )
+        if not self.job_Info:
+            return False
+        state = self.job_Info.get("state", "")
+        return state in ("paused", "pausing")
 
     def getPercent(self):
         self.virtual_sdcard_stats = self.printer.lookup_object(
