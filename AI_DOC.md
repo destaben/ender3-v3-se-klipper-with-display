@@ -189,7 +189,7 @@ This repository is a **modified fork of [Klipper](https://www.klipper3d.org/)** 
 
 - Python code follows Klipper's existing conventions (no strict PEP8 enforcement observed).
 - C code follows Klipper's MCU coding style.
-- Markdown includes markdownlint-disable directives for specific rules (MD041, MD026, MD001).
+- Some Markdown files include markdownlint-disable directives for specific rules (MD041, MD026, MD001).
 
 ---
 
