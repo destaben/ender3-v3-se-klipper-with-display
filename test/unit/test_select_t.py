@@ -13,7 +13,8 @@ import importlib.util
 
 # Load e3v3se_display module source without executing relative imports
 # by extracting just the select_t class definition.
-_extras_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'klippy', 'extras')
+_extras_dir = os.path.join(
+    os.path.dirname(__file__), '..', '..', 'klippy', 'extras')
 _source_path = os.path.join(_extras_dir, 'e3v3se_display.py')
 
 # Read select_t class from source to avoid relative import issues

@@ -50,8 +50,10 @@ class DisplayEmulatorSerial:
 
         # Try to load a basic font
         try:
-            self._font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", 12)
-            self._font_large = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", 16)
+            _f = ("/usr/share/fonts/truetype/dejavu"
+                  "/DejaVuSansMono.ttf")
+            self._font = ImageFont.truetype(_f, 12)
+            self._font_large = ImageFont.truetype(_f, 16)
         except (IOError, OSError):
             self._font = ImageFont.load_default()
             self._font_large = self._font
@@ -199,10 +201,12 @@ class TestVisualPrintProgress(unittest.TestCase):
         d.draw_rectangle_on_display(10, 270, 75, 310, (231, 76, 60), fill=True)
         d.draw_text(20, 283, "Stop", color=(255, 255, 255))
 
-        d.draw_rectangle_on_display(85, 270, 155, 310, (241, 196, 15), fill=True)
+        d.draw_rectangle_on_display(
+            85, 270, 155, 310, (241, 196, 15), fill=True)
         d.draw_text(95, 283, "Pause", color=(0, 0, 0))
 
-        d.draw_rectangle_on_display(165, 270, 229, 310, (52, 152, 219), fill=True)
+        d.draw_rectangle_on_display(
+            165, 270, 229, 310, (52, 152, 219), fill=True)
         d.draw_text(175, 283, "Tune", color=(255, 255, 255))
 
         filepath = d.save("print_progress_50.png")
@@ -230,7 +234,8 @@ class TestVisualPrintProgress(unittest.TestCase):
         d.draw_text(10, 150, "Total time: 02:47:30", color=(150, 150, 150))
 
         # Confirmation button
-        d.draw_rectangle_on_display(60, 250, 180, 290, (46, 204, 113), fill=True)
+        d.draw_rectangle_on_display(
+            60, 250, 180, 290, (46, 204, 113), fill=True)
         d.draw_text(90, 263, "Done", color=(255, 255, 255))
 
         filepath = d.save("print_complete.png")
@@ -265,7 +270,8 @@ class TestVisualTemperatureScreen(unittest.TestCase):
         ]
 
         for label, value, y in items:
-            d.draw_rectangle_on_display(0, y, 239, y + 38, (20, 20, 20), fill=True)
+            d.draw_rectangle_on_display(
+                0, y, 239, y + 38, (20, 20, 20), fill=True)
             d.draw_rectangle_on_display(0, y, 239, y + 38, (50, 50, 50))
             d.draw_text(45, y + 10, label, color=(220, 220, 220))
             if value:
@@ -293,14 +299,21 @@ class TestVisualProtocolFrames(unittest.TestCase):
         draw = ImageDraw.Draw(img)
 
         try:
-            font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", 11)
-            font_title = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 14)
+            _mono = ("/usr/share/fonts/truetype/dejavu"
+                     "/DejaVuSansMono.ttf")
+            _bold = ("/usr/share/fonts/truetype/dejavu"
+                     "/DejaVuSans-Bold.ttf")
+            font = ImageFont.truetype(_mono, 11)
+            font_title = ImageFont.truetype(_bold, 14)
         except (IOError, OSError):
             font = ImageFont.load_default()
             font_title = font
 
         # Title
-        draw.text((10, 10), "TJC3224 Display Protocol - Frame Structure", fill=(255, 255, 255), font=font_title)
+        draw.text(
+            (10, 10),
+            "TJC3224 Display Protocol - Frame Structure",
+            fill=(255, 255, 255), font=font_title)
 
         # Frame structure diagram
         y = 50
@@ -316,7 +329,9 @@ class TestVisualProtocolFrames(unittest.TestCase):
         ]
 
         for x, label, color in boxes:
-            draw.rectangle([x, y, x + 80, y + 50], fill=color, outline=(255, 255, 255))
+            draw.rectangle(
+                [x, y, x + 80, y + 50], fill=color,
+                outline=(255, 255, 255))
             draw.text((x + 5, y + 5), label, fill=(0, 0, 0), font=font)
 
         # Arrows between boxes
@@ -324,7 +339,9 @@ class TestVisualProtocolFrames(unittest.TestCase):
             x_start = boxes[i][0] + 80
             x_end = boxes[i + 1][0]
             mid_y = y + 25
-            draw.line([x_start, mid_y, x_end, mid_y], fill=(150, 150, 150), width=2)
+            draw.line(
+                [x_start, mid_y, x_end, mid_y],
+                fill=(150, 150, 150), width=2)
 
         # Example commands
         y = 140
@@ -333,20 +350,30 @@ class TestVisualProtocolFrames(unittest.TestCase):
 
         commands = [
             ("Handshake", "AA 00 CC 33 C3 3C"),
-            ("Clear Screen", "AA 40 [fg_hi] [fg_lo] [bg_hi] [bg_lo] CC 33 C3 3C  +  AA 52 CC 33 C3 3C"),
+            ("Clear Screen",
+             "AA 40 [fg_hi] [fg_lo] [bg_hi] [bg_lo] CC 33 C3 3C"
+             "  +  AA 52 CC 33 C3 3C"),
             ("Set Brightness", "AA 5F [level] CC 33 C3 3C"),
-            ("Draw Line", "AA 40 ... CC 33 C3 3C  +  AA 51 [x1_hi] [x1_lo] [y1_hi] [y1_lo] [x2_hi] [x2_lo] [y2_hi] [y2_lo] CC 33 C3 3C"),
-            ("Draw String", "AA 98 [x_hi] [x_lo] [y_hi] [y_lo] [font] [mode] [size] [color] [bg] [text...] CC 33 C3 3C"),
+            ("Draw Line",
+             "AA 40 ... CC 33 C3 3C  +  AA 51"
+             " [x1_hi] [x1_lo] [y1_hi] [y1_lo]"
+             " [x2_hi] [x2_lo] [y2_hi] [y2_lo] CC 33 C3 3C"),
+            ("Draw String",
+             "AA 98 [x_hi] [x_lo] [y_hi] [y_lo]"
+             " [font] [mode] [size] [color] [bg] [text...]"
+             " CC 33 C3 3C"),
         ]
 
         for cmd_name, cmd_bytes in commands:
-            draw.text((10, y), f"  {cmd_name}:", fill=(100, 200, 255), font=font)
+            draw.text((10, y), f"  {cmd_name}:",
+                      fill=(100, 200, 255), font=font)
             draw.text((140, y), cmd_bytes, fill=(200, 200, 200), font=font)
             y += 20
 
         # Color legend
         y = 290
-        draw.text((10, y), "Color Format: RGB565 (16-bit)", fill=(200, 200, 200), font=font)
+        draw.text((10, y), "Color Format: RGB565 (16-bit)",
+                  fill=(200, 200, 200), font=font)
         y += 20
         colors_demo = [
             ("White (0xFFFF)", (255, 255, 255)),
@@ -356,7 +383,8 @@ class TestVisualProtocolFrames(unittest.TestCase):
             ("Blue (0x001F)", (0, 0, 255)),
         ]
         for label, color in colors_demo:
-            draw.rectangle([10, y, 30, y + 15], fill=color, outline=(100, 100, 100))
+            draw.rectangle([10, y, 30, y + 15],
+                           fill=color, outline=(100, 100, 100))
             draw.text((35, y), label, fill=(180, 180, 180), font=font)
             y += 20
 
@@ -398,7 +426,9 @@ class TestVisualMenuNavigation(unittest.TestCase):
             draw = ImageDraw.Draw(img)
 
             try:
-                font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", 11)
+                _fp = ("/usr/share/fonts/truetype/dejavu"
+                       "/DejaVuSansMono.ttf")
+                font = ImageFont.truetype(_fp, 11)
             except (IOError, OSError):
                 font = ImageFont.load_default()
 
@@ -411,15 +441,22 @@ class TestVisualMenuNavigation(unittest.TestCase):
                 y = 40 + i * 65
                 if i == state["selected"]:
                     # Selected item - brighter with border
-                    draw.rectangle([5, y, 234, y + 55], fill=color, outline=(255, 255, 255), width=2)
-                    draw.text((15, y + 18), f"> {label}", fill=(255, 255, 255), font=font)
+                    draw.rectangle(
+                        [5, y, 234, y + 55], fill=color,
+                        outline=(255, 255, 255), width=2)
+                    draw.text((15, y + 18), f"> {label}",
+                              fill=(255, 255, 255), font=font)
                 else:
                     # Non-selected item
-                    draw.rectangle([10, y + 3, 229, y + 52], fill=(40, 40, 40), outline=color)
-                    draw.text((20, y + 18), f"  {label}", fill=(180, 180, 180), font=font)
+                    draw.rectangle([10, y + 3, 229, y + 52],
+                                   fill=(40, 40, 40), outline=color)
+                    draw.text((20, y + 18), f"  {label}",
+                              fill=(180, 180, 180), font=font)
 
             # Encoder indicator
-            draw.text((5, 300), f"Encoder pos: {state['selected']}", fill=(100, 100, 100), font=font)
+            draw.text((5, 300),
+                      f"Encoder pos: {state['selected']}",
+                      fill=(100, 100, 100), font=font)
 
             frames.append(img)
 
