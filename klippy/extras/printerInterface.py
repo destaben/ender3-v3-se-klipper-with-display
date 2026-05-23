@@ -463,7 +463,7 @@ class PrinterData:
                             match = re.search(r"(\d+\.\d+)", line)
                             if match:
                                 height = float(match.group(1))
-                                self.metadata['layer_height'] = f"{height}mm"
+                                self.metadata['layer_height'] = "%smm" % height
 
                         elif "estimated printing time" in line:
                             # Extract hours, minutes, and seconds
@@ -475,9 +475,9 @@ class PrinterData:
                                 seconds = match.group(3) or "00"
                                 # Format as --h--m--s
                                 if hours:
-                                    t = f"{hours}h{minutes}m{seconds}s"
+                                    t = "%sh%sm%ss" % (hours, minutes, seconds)
                                 else:
-                                    t = f'{minutes}m{seconds}s'
+                                    t = "%sm%ss" % (minutes, seconds)
                                 self.metadata['estimated_time'] = t
 
                         elif "filament used [mm]" in line:
@@ -487,14 +487,14 @@ class PrinterData:
                             if match:
                                 filament_used_mm = float(match.group(1))
                                 used_m = round(filament_used_mm / 1000, 2)
-                                self.metadata['filament_used'] = f"{used_m}m"
+                                self.metadata['filament_used'] = "%sm" % used_m
 
                     if "; EXECUTABLE_BLOCK_END" in line:
                         executable_block_end = True
 
 
         except FileNotFoundError:
-            self.log(f"Unable to find file: {fileDir}")
+            self.log("Unable to find file: %s" % fileDir)
 
 
     def sendGCode(self, Gcode):

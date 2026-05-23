@@ -1277,22 +1277,24 @@ class E3v3seDisplay:
                 encoder_state == self.ENCODER_DIFF_FAST_CW):
             if math.floor(current_pos - step) <= min_z:
                 self.error(
-                    f"Ignoring move '{current_pos - step}'"
-                    f" as it is lower than Z limit '{min_z}'!")
+                    "Ignoring move '%s'"
+                    " as it is lower than Z limit '%s'!"
+                    % (current_pos - step, min_z))
                 error = True
             else:
-                self.gcode.run_script_from_command(f"TESTZ Z=-{step}")
+                self.gcode.run_script_from_command("TESTZ Z=-%s" % step)
             update = True
         elif (encoder_state == self.ENCODER_DIFF_CCW or
                 encoder_state == self.ENCODER_DIFF_FAST_CCW):
             step = self.MANUAL_PROBE_STEPS[self.manual_probe_step_index]
             if math.ceil(current_pos + step) >= max_z:
                 self.error(
-                    f"Ignoring move '{current_pos + step}'"
-                    f" as it is greater than Z limit '{max_z}'!")
+                    "Ignoring move '%s'"
+                    " as it is greater than Z limit '%s'!"
+                    % (current_pos + step, max_z))
                 error = True
             else:
-                self.gcode.run_script_from_command(f"TESTZ Z={step}")
+                self.gcode.run_script_from_command("TESTZ Z=%s" % step)
             update = True
         elif encoder_state == self.ENCODER_DIFF_ENTER:
             self.manual_probe_step_index = (
@@ -3975,7 +3977,7 @@ class E3v3seDisplay:
             self.MENU_CHR_W,
             self.lcd.screen_width / 2,
             self.HEADER_HEIGHT / 2,
-            f"Icon finder"
+            "Icon finder"
         )
 
         self.lcd.draw_icon(
