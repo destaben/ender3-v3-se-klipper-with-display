@@ -115,7 +115,7 @@ config WANT_HARD_PWM
 config WANT_PRTOUCH
     bool
     depends on HAVE_GPIO
-    default y
+    default n
 config WANT_BUTTONS
     bool
     depends on HAVE_GPIO
