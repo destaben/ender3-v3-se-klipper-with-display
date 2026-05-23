@@ -175,7 +175,7 @@ class PrinterData:
     def handle_ready(self):
         self.update_variable()
         self.get_additional_values()
- 
+
 
     def get_additional_values(self):
         toolhead = self.printer.lookup_object(
@@ -212,7 +212,7 @@ class PrinterData:
                                 "z_offset"
                             ]
                         )
-    
+
     def ishomed(self):
         if (
             self.current_position.home_x
@@ -236,7 +236,8 @@ class PrinterData:
     def GetFiles(self):
         sdcard = self.printer.lookup_object('virtual_sdcard')
         files = sdcard.get_file_list(True)
-        self.subdirIndex = len(self.subdirPath.split('/')) if self.subdirPath else 0
+        split_len = len(self.subdirPath.split('/'))
+        self.subdirIndex = split_len if self.subdirPath else 0
         self.fl = []
         self.names = []
         self.subdirs = []
@@ -260,9 +261,9 @@ class PrinterData:
                 if len(path) == self.subdirIndex + 1:
                     self.names.append(path[self.subdirIndex])
                     self.fl.append(file)
-        
+
         return self.names
-    
+
     def selectFile(self, index):
         file = self.fl[index]
         if len(file.split('/')) == self.subdirIndex + 1:
@@ -289,7 +290,7 @@ class PrinterData:
             "gcode_move").get_status(self.reactor.monotonic())
         z_offset = gcm["homing_origin"][2]  # z offset
         extrusionMultiplier = gcm["extrude_factor"] * 100  # flow rate percent
-        self.absolute_moves = gcm["absolute_coordinates"]  # absolute or relative
+        self.absolute_moves = gcm["absolute_coordinates"]  # absolute/relative
         self.absolute_extrude = gcm["absolute_extrude"]  # absolute or relative
         speed = gcm["speed"]  # current speed in mm/s
         print_speed = gcm["speed_factor"] * 100  # print speed percent
@@ -302,8 +303,9 @@ class PrinterData:
         fanSpeed = fan['speed'] * 100
         Update = False
         try:
-            if self.thermalManager["temp_bed"]["celsius"] != int(bed["temperature"]):
-                self.thermalManager["temp_bed"]["celsius"] = int(bed["temperature"])
+            bed_temp = int(bed["temperature"])
+            if self.thermalManager["temp_bed"]["celsius"] != bed_temp:
+                self.thermalManager["temp_bed"]["celsius"] = bed_temp
                 Update = True
             if self.thermalManager["temp_bed"]["target"] != int(bed["target"]):
                 self.thermalManager["temp_bed"]["target"] = int(bed["target"])
@@ -339,7 +341,7 @@ class PrinterData:
                 self.HMI_ValueStruct.offset_value = z_offset * 100
                 Update = True
         except:
-            pass  # missing key, shouldn't happen, fixes misses on conditionals ¯\_(ツ)_/¯
+            pass  # missing key, shouldn't happen
         self.job_Info = self.printer.lookup_object(
             "print_stats").get_status(self.reactor.monotonic())
         if self.job_Info:
@@ -407,35 +409,39 @@ class PrinterData:
     def preheat(self, profile):
         if profile == "PLA":
             self.preHeat(
-                self.material_preset[0].bed_temp, self.material_preset[0].hotend_temp
+                self.material_preset[0].bed_temp,
+                self.material_preset[0].hotend_temp
             )
         elif profile == "ABS":
             self.preHeat(
-                self.material_preset[1].bed_temp, self.material_preset[1].hotend_temp
+                self.material_preset[1].bed_temp,
+                self.material_preset[1].hotend_temp
             )
 
     def preHeat(self, bedtemp, exttemp, toolnum=0):
         # these work but invoke a wait which hangs the screen until they finish.
-        # 		self.sendGCode('M140 S%s\nM190 S%s' % (bedtemp, bedtemp))
-        # 		self.sendGCode('M104 T%s S%s\nM109 T%s S%s' % (toolnum, exttemp, toolnum, exttemp))
         self.setBedTemp(bedtemp)
         self.setExtTemp(exttemp)
-    
+
     def bedIsHeating(self):
         bed = self.printer.lookup_object(
             "heater_bed").get_status(self.reactor.monotonic())
         return (int(bed["target"]) > int(bed["temperature"])) if bed else False
-         
+
     def nozzleIsHeating(self):
         extruder = self.printer.lookup_object(
             "extruder").get_status(self.reactor.monotonic())
-        return (int(extruder["target"]) > int(extruder["temperature"])) if extruder else False
-    
+        return (
+            (int(extruder["target"]) > int(extruder["temperature"]))
+            if extruder else False)
+
     def openFile(self, file):
         self.selectedFile = file
-    
+
     def printSelectedFile(self):
-        self.sendGCode('SDCARD_PRINT_FILE FILENAME="{}"'.format(str(self.selectedFile)))
+        cmd = 'SDCARD_PRINT_FILE FILENAME="{}"'.format(
+            str(self.selectedFile))
+        self.sendGCode(cmd)
 
     def scanMetadata(self):
         sdcard = self.printer.lookup_object('virtual_sdcard')
@@ -446,38 +452,49 @@ class PrinterData:
             'filament_used': None,
             'thumbnail': None # Default to placeholder image
         }
-        
+
         try:
             with open(fileDir, 'r') as file:
                 executable_block_end = False
                 for line in file:
                     if executable_block_end:
                         if "; layer_height" in line:
-                            match = re.search(r"(\d+\.\d+)", line) # Extract the value
+                            # Extract the value
+                            match = re.search(r"(\d+\.\d+)", line)
                             if match:
-                                self.metadata['layer_height'] = f"{float(match.group(1))}mm"
+                                height = float(match.group(1))
+                                self.metadata['layer_height'] = "%smm" % height
 
                         elif "estimated printing time" in line:
-                            match = re.search(r'(?:(\d+)h)?\s*(\d+)m?\s*(\d+)s?', line)  # Extract hours, minutes, and seconds
+                            # Extract hours, minutes, and seconds
+                            pattern = r'(?:(\d+)h)?\s*(\d+)m?\s*(\d+)s?'
+                            match = re.search(pattern, line)
                             if match:
                                 hours = match.group(1) if match.group(1) else ""
-                                minutes = match.group(2) if match.group(2) else "00"
-                                seconds = match.group(3) if match.group(3) else "00"
+                                minutes = match.group(2) or "00"
+                                seconds = match.group(3) or "00"
                                 # Format as --h--m--s
-                                self.metadata['estimated_time'] = f"{hours}h{minutes}m{seconds}s" if hours else f'{minutes}m{seconds}s'
+                                if hours:
+                                    t = "%sh%sm%ss" % (hours, minutes, seconds)
+                                else:
+                                    t = "%sm%ss" % (minutes, seconds)
+                                self.metadata['estimated_time'] = t
 
                         elif "filament used [mm]" in line:
-                            match = re.search(r"filament used \[mm\] = (\d+\.\d+)", line) # Extract the value
+                            # Extract the value
+                            pattern = r"filament used \[mm\] = (\d+\.\d+)"
+                            match = re.search(pattern, line)
                             if match:
                                 filament_used_mm = float(match.group(1))
-                                self.metadata['filament_used'] = f"{round(filament_used_mm / 1000, 2)}m"
-                        
+                                used_m = round(filament_used_mm / 1000, 2)
+                                self.metadata['filament_used'] = "%sm" % used_m
+
                     if "; EXECUTABLE_BLOCK_END" in line:
                         executable_block_end = True
 
-                            
+
         except FileNotFoundError:
-            self.log(f"Unable to find file: {fileDir}")
+            self.log("Unable to find file: %s" % fileDir)
 
 
     def sendGCode(self, Gcode):
@@ -485,7 +502,9 @@ class PrinterData:
 
     def probe_calibrate(self):
         self.sendGCode('G28') # home the printer
-        self.sendGCode('PRTOUCH_PROBE_OFFSET CLEAR_NOZZLE=0 APPLY_Z_ADJUST=1') # use the prtouch to find the z offset and apply it
+        # use the prtouch to find the z offset and apply it
+        self.sendGCode(
+            'PRTOUCH_PROBE_OFFSET CLEAR_NOZZLE=0 APPLY_Z_ADJUST=1')
 
     def resume_job(self):
         self.sendGCode('RESUME') # resume the print
@@ -497,11 +516,13 @@ class PrinterData:
         self.sendGCode('CANCEL_PRINT') # cancel the print
 
     def set_feedrate(self, value):
-        self.sendGCode('M220 S' + str(value)) # set the feedrate through the M220 gcode command
+        self.sendGCode('M220 S' + str(value))  # set feedrate via M220
 
     def moveAbsolute(self, axis, pos, feedrate):
         self.sendGCode('M82') # change to absolute positioning
-        self.sendGCode('G1 {}{} F{}'.format(axis, str(pos), str(feedrate))) # move the specified axis at the set feedrate
+        # move the specified axis at the set feedrate
+        self.sendGCode(
+            'G1 {}{} F{}'.format(axis, str(pos), str(feedrate)))
 
     def save_settings(self):
         self.sendGCode('SAVE_CONFIG') # save the current configuration changes
