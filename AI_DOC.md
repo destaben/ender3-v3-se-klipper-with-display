@@ -34,7 +34,7 @@ This repository is a **modified fork of [Klipper](https://www.klipper3d.org/)** 
 | MCU firmware | C (Klipper MCU code + serial bridge) | `src/` |
 | Host-side Klipper | Python (klippy) | `klippy/` |
 | Display driver | Python (e3v3se_display extra) | `klippy/extras/e3v3se_display.py` |
-| Display protocol | TJC3224 LCD communication | `klippy/extras/TJC3224/` |
+| Display protocol | TJC3224 LCD communication | `klippy/extras/TJC3224.py` |
 | Printer interface | Python abstraction | `klippy/extras/printerInterface.py` |
 | Serial bridge (MCU) | C | `src/serial_bridge.c` |
 | Serial bridge (host) | Python | `klippy/extras/serial_bridge.py` |
@@ -67,7 +67,7 @@ This repository is a **modified fork of [Klipper](https://www.klipper3d.org/)** 
 ├── klippy/                    # Python host-side Klipper code
 │   ├── extras/                # Klipper extras/plugins
 │   │   ├── e3v3se_display.py  # Main display driver (the core custom code)
-│   │   ├── TJC3224/           # Display communication protocol
+│   │   ├── TJC3224.py         # Display communication protocol
 │   │   ├── printerInterface.py# Printer data abstraction
 │   │   ├── serial_bridge.py   # Host-side serial bridge handling
 │   │   └── display/           # Display menu and UI logic
@@ -98,8 +98,8 @@ This repository is a **modified fork of [Klipper](https://www.klipper3d.org/)** 
 
 1. **Modify display behavior:** Edit `klippy/extras/e3v3se_display.py` and related display modules.
 2. **Change serial bridge:** Edit `src/serial_bridge.c` (MCU side) and `klippy/extras/serial_bridge.py` (host side).
-3. **Add display features:** Work with `klippy/extras/TJC3224/` for protocol-level changes.
-4. **CI builds:** GitHub Actions automatically builds firmware on push (see `.github/workflows/build-firmware.yaml`).
+3. **Add display features:** Work with `klippy/extras/TJC3224.py` for protocol-level changes.
+4. **CI builds:** GitHub Actions can build firmware via manual trigger (`workflow_dispatch`) in `.github/workflows/build-firmware.yaml`.
 5. **Testing:** `test/` directory contains Klipper's test infrastructure.
 
 ---
@@ -180,7 +180,7 @@ This repository is a **modified fork of [Klipper](https://www.klipper3d.org/)** 
 
 ### CI/CD
 
-- `build-firmware.yaml` — Builds MCU firmware on push.
+- `build-firmware.yaml` — Builds MCU firmware via manual `workflow_dispatch`.
 - `release-firmware.yaml` — Creates releases with pre-built binaries.
 - `build-test.yaml` — Runs Klipper test suite.
 - Firmware artifacts are `.bin` files for SD card flashing.
@@ -189,7 +189,7 @@ This repository is a **modified fork of [Klipper](https://www.klipper3d.org/)** 
 
 - Python code follows Klipper's existing conventions (no strict PEP8 enforcement observed).
 - C code follows Klipper's MCU coding style.
-- Markdown uses markdownlint with some disabled rules (MD041, MD026, MD001).
+- Markdown includes markdownlint-disable directives for specific rules (MD041, MD026, MD001).
 
 ---
 
@@ -226,7 +226,7 @@ This repository is a **modified fork of [Klipper](https://www.klipper3d.org/)** 
 ### Parsing This Repository
 
 1. **Start here** (`AI_DOC.md`) for full project context.
-2. **For display logic:** Focus on `klippy/extras/e3v3se_display.py` and `klippy/extras/TJC3224/`.
+2. **For display logic:** Focus on `klippy/extras/e3v3se_display.py` and `klippy/extras/TJC3224.py`.
 3. **For firmware/MCU questions:** Look at `src/serial_bridge.c` and `src/stm32/`.
 4. **For configuration questions:** Reference `README.md` and `e3v3se_docs/configuration.md`.
 5. **For build/install questions:** Reference `e3v3se_docs/install.md` and the Makefile.
@@ -243,7 +243,7 @@ This repository is a **modified fork of [Klipper](https://www.klipper3d.org/)** 
 
 | Task | Key Files |
 |------|-----------|
-| Fix display bug | `klippy/extras/e3v3se_display.py`, `klippy/extras/TJC3224/` |
+| Fix display bug | `klippy/extras/e3v3se_display.py`, `klippy/extras/TJC3224.py` |
 | Add display feature | `klippy/extras/e3v3se_display.py`, `klippy/extras/display/` |
 | Fix serial communication | `src/serial_bridge.c`, `klippy/extras/serial_bridge.py` |
 | Update build config | `src/Kconfig`, `Makefile` |
