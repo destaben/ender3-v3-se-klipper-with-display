@@ -667,7 +667,7 @@ class E3v3seDisplay:
             self.manual_probe = self.printer.lookup_object("manual_probe")
             if self.manual_probe is not None:
                 return self.manual_probe.status["is_active"]
-        except (KeyError, AttributeError, self.printer.config_error):
+        except (KeyError, AttributeError, Exception):
             pass
 
         return False

@@ -64,7 +64,7 @@ class TJC3224_LCD:
             serial : Serial object to send messages.
         """
         self.serial = serial
-        self.data_frame = self.data_frame_head
+        self.data_frame = b"\xAA"
     
     def init_display(self):
         logging.info("TJC3224: Sending handshake...")
