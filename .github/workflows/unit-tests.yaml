@@ -16,7 +16,7 @@ jobs:
         python-version: '3.11'
 
     - name: Run unit tests
-      run: python -m unittest discover -s test/unit -p "test_printer_interface.py" -v && python -m unittest discover -s test/unit -p "test_tjc3224.py" -v && python -m unittest discover -s test/unit -p "test_select_t.py" -v
+      run: python -m unittest discover -s test/unit -p "test_[!v]*.py" -v
 
   visual-tests:
     name: Visual Display Tests

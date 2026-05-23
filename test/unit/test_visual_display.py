@@ -5,21 +5,14 @@
 # Generated images are saved to test/unit/visual_output/ and uploaded
 # as artifacts in CI.
 
-import sys
 import os
 import unittest
-
-# Add the klippy extras path so we can import the modules under test
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', 'klippy', 'extras'))
-sys.path.insert(0, os.path.dirname(__file__))
 
 try:
     from PIL import Image, ImageDraw, ImageFont
     HAS_PILLOW = True
 except ImportError:
     HAS_PILLOW = False
-
-from TJC3224 import TJC3224_LCD
 
 # Output directory for visual test screenshots
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'visual_output')
@@ -122,7 +115,6 @@ class TestVisualMainMenu(unittest.TestCase):
 
     def setUp(self):
         self.display = DisplayEmulatorSerial()
-        self.lcd = TJC3224_LCD(self.display)
         os.makedirs(OUTPUT_DIR, exist_ok=True)
 
     def test_main_menu_layout(self):
@@ -166,7 +158,6 @@ class TestVisualPrintProgress(unittest.TestCase):
 
     def setUp(self):
         self.display = DisplayEmulatorSerial()
-        self.lcd = TJC3224_LCD(self.display)
         os.makedirs(OUTPUT_DIR, exist_ok=True)
 
     def test_print_progress_50_percent(self):
