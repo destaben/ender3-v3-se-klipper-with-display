@@ -81,7 +81,7 @@ speed (via the `F` parameter) on the first `G1` command.
 The gcode_macro `gcode:` config section is evaluated using the Jinja2
 template language. One can evaluate expressions at run-time by
 wrapping them in `{ }` characters or use conditional statements
-wrapped in `{% %}`. See the
+wrapped in `{% raw %}{% %}{% endraw %}`. See the
 [Jinja2 documentation](http://jinja.pocoo.org/docs/2.10/templates/)
 for further information on the syntax.
 
