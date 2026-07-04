@@ -86,6 +86,7 @@ wrapped in `{% raw %}{% %}{% endraw %}`. See the
 for further information on the syntax.
 
 An example of a complex macro:
+{% raw %}
 ```
 [gcode_macro clean_nozzle]
 gcode:
@@ -100,6 +101,7 @@ gcode:
   {% endfor %}
   RESTORE_GCODE_STATE NAME=clean_nozzle_state
 ```
+{% endraw %}
 
 ### Macro parameters
 
@@ -121,12 +123,14 @@ math then they must be explicitly converted to integers or floats.
 It's common to use the Jinja2 `set` directive to use a default
 parameter and assign the result to a local name. For example:
 
+{% raw %}
 ```
 [gcode_macro SET_BED_TEMPERATURE]
 gcode:
   {% set bed_temp = params.TEMPERATURE|default(40)|float %}
   M140 S{bed_temp}
 ```
+{% endraw %}
 
 ### The "rawparams" variable
 
@@ -171,12 +175,14 @@ access it via the `[ ]` accessor - for example:
 Note that the Jinja2 `set` directive can assign a local name to an
 object in the `printer` hierarchy. This can make macros more readable
 and reduce typing. For example:
+{% raw %}
 ```
 [gcode_macro QUERY_HTU21D]
 gcode:
     {% set sensor = printer["htu21d my_sensor"] %}
     M117 Temp:{sensor.temperature} Humidity:{sensor.humidity}
 ```
+{% endraw %}
 
 ## Actions
 
@@ -322,14 +328,17 @@ restarts. All stored variables are loaded into the
 `printer.save_variables.variables` dict at startup and can be used in
 gcode macros. to avoid overly long lines you can add the following at
 the top of the macro:
+{% raw %}
 ```
 {% set svv = printer.save_variables.variables %}
 ```
+{% endraw %}
 
 As an example, it could be used to save the state of 2-in-1-out hotend
 and when starting a print ensure that the active extruder is used,
 instead of T0:
 
+{% raw %}
 ```
 [gcode_macro T1]
 gcode:
@@ -346,3 +355,4 @@ gcode:
   {% set svv = printer.save_variables.variables %}
   ACTIVATE_EXTRUDER extruder={svv.currentextruder}
 ```
+{% endraw %}
