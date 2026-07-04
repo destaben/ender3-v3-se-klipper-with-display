@@ -12,20 +12,6 @@ def current_milli_time():
     return round(time.time() * 1000)
 
 
-def _MAX(lhs, rhs):
-    if lhs > rhs:
-        return lhs
-    else:
-        return rhs
-
-
-def _MIN(lhs, rhs):
-    if lhs < rhs:
-        return lhs
-    else:
-        return rhs
-
-
 class select_t:
     now = 0
     last = 0
@@ -710,8 +696,10 @@ class E3v3seDisplay:
             self.manual_probe = self.printer.lookup_object("manual_probe")
             if self.manual_probe is not None:
                 return self.manual_probe.status["is_active"]
-        except BaseException:
+        except (KeyError, AttributeError, TypeError):
             pass
+        except Exception as e:
+            logging.debug("Unexpected error in is_manual_probe_active: %s", e)
 
         return False
 
@@ -4048,8 +4036,7 @@ class E3v3seDisplay:
         # Copy into filebuf string before entry
         name = self.pd.file_name
         if name:
-            npos = _MAX(0, self.lcd.screen_width -
-                        len(name) * self.MENU_CHR_W) / 2
+            npos = max(0, self.lcd.screen_width - len(name) * self.MENU_CHR_W) / 2
             self.lcd.draw_string(
                 False,
                 self.lcd.font_6x12,

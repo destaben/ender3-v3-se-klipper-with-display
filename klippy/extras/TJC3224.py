@@ -1,3 +1,4 @@
+import logging
 import time
 import math
 
@@ -21,8 +22,7 @@ class TJC3224_LCD:
 
     # Data frame structure
     data_frame_head = b"\xAA"
-    data_frame_tail = [0xCC, 0x33, 0xC3, 0x3C]
-    data_frame = []
+    data_frame_tail = bytes([0xCC, 0x33, 0xC3, 0x3C])
 
     # Font size registers (for unicode and 8 bit text mode)
     font_8x8 = 0x00
@@ -66,19 +66,27 @@ class TJC3224_LCD:
             serial : Serial object to send messages.
         """
         self.serial = serial
+        self.data_frame = b"\xAA"
 
     def init_display(self):
-        print("Sending handshake... ")
+        logging.info("TJC3224: Sending handshake...")
+        max_retries = 50
+        retries = 0
         while not self.handshake():
-            pass
-        print("Handshake response: OK.")
+            retries += 1
+            if retries >= max_retries:
+                logging.error("TJC3224: Handshake failed after %d retries",
+                              max_retries)
+                return
+            time.sleep(0.1)
+        logging.info("TJC3224: Handshake response: OK.")
 
     def byte(self, bool_val):
         """
         Appends a single-byte value to the data frame.
 
-        :param bval: The byte value to be appended.
-        :type bval: int
+        :param bool_val: The byte value to be appended.
+        :type bool_val: int
         """
         self.data_frame += int(bool_val).to_bytes(1, byteorder="big")
 
@@ -86,8 +94,8 @@ class TJC3224_LCD:
         """
         Appends a two-byte value to the data frame.
 
-        :param wval: The two-byte value to be appended.
-        :type wval: int
+        :param word_val: The two-byte value to be appended.
+        :type word_val: int
         """
         self.data_frame += int(word_val).to_bytes(2, byteorder="big")
 
@@ -95,8 +103,8 @@ class TJC3224_LCD:
         """
         Appends a four-byte value to the data frame.
 
-        :param lval: The four-byte value to be appended.
-        :type lval: int
+        :param long_val: The four-byte value to be appended.
+        :type long_val: int
         """
         self.data_frame += int(long_val).to_bytes(4,
                                                   byteorder="big", signed=True)
@@ -105,8 +113,8 @@ class TJC3224_LCD:
         """
         Appends an eight-byte value to the data frame.
 
-        :param dval: The eight-byte value to be appended.
-        :type value: int
+        :param double_val: The eight-byte value to be appended.
+        :type double_val: int
         """
         self.data_frame += int(double_val).to_bytes(8, byteorder="big")
 
