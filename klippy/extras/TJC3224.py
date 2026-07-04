@@ -2,6 +2,7 @@ import logging
 import time
 import math
 
+
 class TJC3224_LCD:
     """
     Class representing the control interface for a TJC3224 LCD display.
@@ -11,7 +12,8 @@ class TJC3224_LCD:
     for the TJC3224_011N display (3.2 inch, 240x320 pixels, no touch) used
     on 3d printers from creality. Most of the instructions are compatible
     with DWIN T5L instruction set available on the manufacturer website
-    (https://www.dwin-global.com/uploads/T5L_TA-Instruction-Set-Development-Guide.pdf)
+    (https://www.dwin-global.com/uploads/
+    T5L_TA-Instruction-Set-Development-Guide.pdf)
     """
 
     # Display resolution
@@ -65,7 +67,7 @@ class TJC3224_LCD:
         """
         self.serial = serial
         self.data_frame = b"\xAA"
-    
+
     def init_display(self):
         logging.info("TJC3224: Sending handshake...")
         max_retries = 50
@@ -104,7 +106,8 @@ class TJC3224_LCD:
         :param long_val: The four-byte value to be appended.
         :type long_val: int
         """
-        self.data_frame += int(long_val).to_bytes(4, byteorder="big", signed=True)
+        self.data_frame += int(long_val).to_bytes(4,
+                                                  byteorder="big", signed=True)
 
     def double_64(self, double_val):
         """
@@ -126,12 +129,15 @@ class TJC3224_LCD:
 
     def send(self):
         """
-        Sends the prepared data frame to the display according to the T5L_TA serial protocol.
+        Sends the prepared data frame to the display
+        according to the T5L_TA serial protocol.
 
         Sends the current contents of the data frame, followed by a predefined
-        tail sequence. After sending, the data frame is reset to the head sequence.
+        tail sequence. After sending, the data frame is
+        reset to the head sequence.
         """
-        # Write the current data frame and tail sequence to the serial connection
+        # Write the current data frame and tail sequence to the serial
+        # connection
         self.serial.write(self.data_frame)
         self.serial.write(self.data_frame_tail)
 
@@ -166,7 +172,8 @@ class TJC3224_LCD:
         self.byte(min(brightness, 0x40))
         self.send()
 
-    def set_palette(self, background_color=color_black, foreground_color=color_white):
+    def set_palette(self, background_color=color_black,
+                    foreground_color=color_white):
         """
         Set the palette colors for drawing functions.
 
@@ -363,7 +370,8 @@ class TJC3224_LCD:
         """
         Draw a string on the screen.
 
-        :param show_background: True to display the background color, False to not display the background color.
+        :param show_background: True to display the background color,
+            False to not display the background color.
         :type show_background: bool
         :param size: Font size.
         :type size: int
@@ -390,12 +398,21 @@ class TJC3224_LCD:
         self.send()
 
     def draw_string_centered(
-        self, show_background, size, font_color, background_color, char_width, char_height, x, y, string
-    ):
+            self,
+            show_background,
+            size,
+            font_color,
+            background_color,
+            char_width,
+            char_height,
+            x,
+            y,
+            string):
         """
         Draw a string centered on the screen.
 
-        :param show_background: True to display the background color, False to not display the background color.
+        :param show_background: True to display the background color,
+            False to not display the background color.
         :type show_background: bool
         :param size: Font size.
         :type size: int
@@ -440,11 +457,13 @@ class TJC3224_LCD:
         """
         Draw a positive integer value on the screen.
 
-        :param show_background: True to display the background color, False to not display the background color.
+        :param show_background: True to display the background color,
+            False to not display the background color.
         :type show_background: bool
         :param zeroFill: True to zero fill, False for no zero fill.
         :type zeroFill: bool
-        :param zeroMode: 1 for leading 0 displayed as 0, 0 for leading 0 displayed as a space.
+        :param zeroMode: 1 for leading 0 displayed as 0,
+            0 for leading 0 displayed as a space.
         :type zeroMode: int
         :param font_size: Font size.
         :type font_size: int
@@ -500,11 +519,13 @@ class TJC3224_LCD:
         """
         Draw a floating point number on the screen.
 
-        :param show_background: True to display the background color, False to not display the background color.
+        :param show_background: True to display the background color,
+            False to not display the background color.
         :type show_background: bool
         :param zeroFill: True to zero fill, False for no zero fill.
         :type zeroFill: bool
-        :param zeroMode: 1 for leading 0 displayed as 0, 0 for leading 0 displayed as a space.
+        :param zeroMode: 1 for leading 0 displayed as 0,
+            0 for leading 0 displayed as a space.
         :type zeroMode: int
         :param size: Font size.
         :type size: int
@@ -546,8 +567,16 @@ class TJC3224_LCD:
         self.send()
 
     def draw_signed_float(
-        self, show_background, size, color, background_color, iNum, fNum, x, y, value
-    ):
+            self,
+            show_background,
+            size,
+            color,
+            background_color,
+            iNum,
+            fNum,
+            x,
+            y,
+            value):
         """
         Draw a signed floating-point number on the screen.
 
@@ -568,8 +597,13 @@ class TJC3224_LCD:
         """
         if value < 0:
             self.draw_string(
-                show_background, size, color, background_color, x - 6, y - 3, "-"
-            )
+                show_background,
+                size,
+                color,
+                background_color,
+                x - 6,
+                y - 3,
+                "-")
             self.draw_float_value(
                 show_background,
                 False,
@@ -585,8 +619,13 @@ class TJC3224_LCD:
             )
         else:
             self.draw_string(
-                show_background, size, color, background_color, x - 6, y - 3, " "
-            )
+                show_background,
+                size,
+                color,
+                background_color,
+                x - 6,
+                y - 3,
+                " ")
             self.draw_float_value(
                 show_background,
                 False,
@@ -605,7 +644,8 @@ class TJC3224_LCD:
         """
         Draw an icon on the screen.
 
-        :param show_background: True to display the background color, False to not display the background color.
+        :param show_background: True to display the background color,
+            False to not display the background color.
         :type show_background: bool
         :param libID: Icon library ID.
         :type libID: int
@@ -640,8 +680,14 @@ class TJC3224_LCD:
         self.send()
 
     def move_screen_area(
-        self, direction, offset, background_color, x_start, y_start, x_end, y_end
-    ):
+            self,
+            direction,
+            offset,
+            background_color,
+            x_start,
+            y_start,
+            x_end,
+            y_end):
         """
         Copy an area from the virtual display area to the current screen.
 
@@ -651,13 +697,17 @@ class TJC3224_LCD:
         :type offset: int
         :param offset: Color of background (to fill the previously moved area?).
         :type offset: int
-        :param x_start: X-coordinate of the upper-left corner of the virtual area.
+        :param x_start: X-coordinate of the upper-left
+            corner of the virtual area.
         :type x_start: int
-        :param y_start: Y-coordinate of the upper-left corner of the virtual area.
+        :param y_start: Y-coordinate of the upper-left
+            corner of the virtual area.
         :type y_start: int
-        :param x_end: X-coordinate of the lower-right corner of the virtual area.
+        :param x_end: X-coordinate of the lower-right
+            corner of the virtual area.
         :type x_end: int
-        :param y_end: Y-coordinate of the lower-right corner of the virtual area.
+        :param y_end: Y-coordinate of the lower-right
+            corner of the virtual area.
         :type y_end: int
         """
         self.byte(self.cmd_move_screen_area)
