@@ -1,0 +1,10 @@
+exclude:
+  - docs/
+  - klippy/
+  - lib/
+  - src/
+  - test/
+  - scripts/
+  - ci_build/
+  - config/
+  - Makefile
