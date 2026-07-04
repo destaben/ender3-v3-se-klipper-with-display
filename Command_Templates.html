@@ -1658,7 +1658,7 @@ wrapping them in <code>{ }</code> characters or use conditional statements
 wrapped in <code>{% raw %}{% %}{% endraw %}</code>. See the
 <a href="http://jinja.pocoo.org/docs/2.10/templates/">Jinja2 documentation</a>
 for further information on the syntax.</p>
-<p>An example of a complex macro:</p>
+<p _="%" raw="raw">An example of a complex macro:</p>
 <div class="highlight"><pre><span></span><code>[gcode_macro clean_nozzle]
 gcode:
   {% set wipe_count = 8 %}
@@ -1673,6 +1673,7 @@ gcode:
   RESTORE_GCODE_STATE NAME=clean_nozzle_state
 </code></pre></div>
 
+<p>{% endraw %}</p>
 <h3 id="macro-parameters">Macro parameters<a class="headerlink" href="#macro-parameters" title="Permanent link">&para;</a></h3>
 <p>It is often useful to inspect parameters passed to the macro when
 it is called. These parameters are available via the <code>params</code>
@@ -1688,12 +1689,14 @@ evaluated in the macro and are always passed as strings. If performing
 math then they must be explicitly converted to integers or floats.</p>
 <p>It's common to use the Jinja2 <code>set</code> directive to use a default
 parameter and assign the result to a local name. For example:</p>
+<p>{% raw %}</p>
 <div class="highlight"><pre><span></span><code>[gcode_macro SET_BED_TEMPERATURE]
 gcode:
   {% set bed_temp = params.TEMPERATURE|default(40)|float %}
   M140 S{bed_temp}
 </code></pre></div>
 
+<p>{% endraw %}</p>
 <h3 id="the-rawparams-variable">The "rawparams" variable<a class="headerlink" href="#the-rawparams-variable" title="Permanent link">&para;</a></h3>
 <p>The full unparsed parameters for the running macro can be access via the
 <code>rawparams</code> pseudo-variable.</p>
@@ -1724,7 +1727,7 @@ exceptions to this rule - notably the <code>gcode_move</code> and <code>toolhead
 objects. If the config section contains spaces in it, then one can
 access it via the <code>[ ]</code> accessor - for example:
 <code>printer["generic_heater my_chamber_heater"].temperature</code>.</p>
-<p>Note that the Jinja2 <code>set</code> directive can assign a local name to an
+<p _="%" raw="raw">Note that the Jinja2 <code>set</code> directive can assign a local name to an
 object in the <code>printer</code> hierarchy. This can make macros more readable
 and reduce typing. For example:</p>
 <div class="highlight"><pre><span></span><code>[gcode_macro QUERY_HTU21D]
@@ -1733,6 +1736,7 @@ gcode:
     M117 Temp:{sensor.temperature} Humidity:{sensor.humidity}
 </code></pre></div>
 
+<p>{% endraw %}</p>
 <h2 id="actions">Actions<a class="headerlink" href="#actions" title="Permanent link">&para;</a></h2>
 <p>There are some commands available that can alter the state of the
 printer. For example, <code>{ action_emergency_stop() }</code> would cause the
@@ -1856,7 +1860,7 @@ then it is possible to customize the menu with
 </li>
 </ul>
 <h2 id="save-variables-to-disk">Save Variables to disk<a class="headerlink" href="#save-variables-to-disk" title="Permanent link">&para;</a></h2>
-<p>If a
+<p _="%" raw="raw">If a
 <a href="Config_Reference.html#save_variables">save_variables config section</a>
 has been enabled, <code>SAVE_VARIABLE VARIABLE=&lt;name&gt; VALUE=&lt;value&gt;</code> can be
 used to save the variable to disk so that it can be used across
@@ -1867,9 +1871,11 @@ the top of the macro:</p>
 <div class="highlight"><pre><span></span><code>{% set svv = printer.save_variables.variables %}
 </code></pre></div>
 
+<p>{% endraw %}</p>
 <p>As an example, it could be used to save the state of 2-in-1-out hotend
 and when starting a print ensure that the active extruder is used,
 instead of T0:</p>
+<p>{% raw %}</p>
 <div class="highlight"><pre><span></span><code>[gcode_macro T1]
 gcode:
   ACTIVATE_EXTRUDER extruder=extruder1
@@ -1885,6 +1891,8 @@ gcode:
   {% set svv = printer.save_variables.variables %}
   ACTIVATE_EXTRUDER extruder={svv.currentextruder}
 </code></pre></div>
+
+<p>{% endraw %}</p>
 
               
             </article>
